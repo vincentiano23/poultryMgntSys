@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Chicken Records</h2>
+    <table border="1">
+        <tr>
+            <th>Category</th>
+            <th>Total Quantity</th>
+            <th>Last Updated</th>
+        </tr>
+        {% for chicken in chickens %}
+        <tr>
+            <td>{{ chicken.category }}</td>
+            <td>{{ chicken.quantity }}</td>
+            <td>{{ chicken.date_added }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'add_chicken' %}">Add More Chickens</a>
+{% endblock %}

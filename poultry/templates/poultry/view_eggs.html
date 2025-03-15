@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Egg Collection Records</h2>
+    <table border="1">
+        <tr>
+            <th>Category</th>
+            <th>Quantity</th>
+            <th>Date Collected</th>
+        </tr>
+        {% for egg in eggs %}
+        <tr>
+            <td>{{ egg.category }}</td>
+            <td>{{ egg.quantity }}</td>
+            <td>{{ egg.date_collected }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'add_eggs' %}">Add More Eggs</a>
+{% endblock %}

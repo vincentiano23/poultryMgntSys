@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">🐔 Workers Dashboard</h2>
+
+    <!-- Summary Section -->
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card bg-primary text-white shadow">
+                <h3>Total Chickens: {{ total_chickens }}</h3>
+                    <ul>
+                        {% for chicken in chicken_types %}
+                            <li>{{ chicken.category }}: {{ chicken.total }}</li>
+                        {% endfor %}
+                    </ul>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Eggs Collected</h5>
+                    <h3>{{ total_eggs }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-12 mb-3">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Sales</h5>
+                    <h3>Ksh {{ total_sales|default:"0" }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forms to Add Records -->
+    <h3 class="mt-4">📌 Record New Data</h3>
+    <div class="row">
+        <!-- Add Chickens -->
+        <div class="col-md-6">
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Add New Chickens</h5>
+                    <form method="POST" action="{% url 'add_chicken' %}">
+                        {% csrf_token %}
+                        <input type="text" name="chicken_type" class="form-control mb-2" placeholder="Type (Broiler, Layer, etc.)" required>
+                        <input type="number" name="quantity" class="form-control mb-2" placeholder="Quantity" required>
+                        <button type="submit" class="btn btn-primary w-100">Add Chickens</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Record Eggs -->
+        <div class="col-md-6">
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Record Eggs Collected</h5>
+                    <form method="POST" action="{% url 'add_eggs' %}">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" class="form-control mb-2" placeholder="Number of Eggs" required>
+                        <button type="submit" class="btn btn-success w-100">Record Eggs</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

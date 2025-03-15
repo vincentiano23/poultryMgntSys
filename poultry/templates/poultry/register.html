@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-sm-8 col-10">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Create an Account</h3>
+
+                    <!-- Display Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} text-center" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password')">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm password" required>
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirm_password')">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Role Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Register As</label>
+                            <select name="role" class="form-control" required>
+                                <option value="admin">Admin</option>
+                                <option value="worker">Worker</option>
+                            </select>
+                        </div>
+
+                        <!-- Register Button -->
+                        <button type="submit" class="btn btn-success w-100">Register</button>
+                    </form>
+
+                    <!-- Already have an account -->
+                    <div class="text-center mt-3">
+                        <p>Already have an account? <a href="{% url 'login' %}" class="text-primary">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Show/Hide Script -->
+<script>
+function togglePassword(fieldId) {
+    var field = document.getElementById(fieldId);
+    if (field.type === "password") {
+        field.type = "text";
+    } else {
+        field.type = "password";
+    }
+}
+</script>
+
+{% endblock %}

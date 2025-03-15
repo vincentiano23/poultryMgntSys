@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Admin Dashboard</h2>
+    <p class="text-center">Welcome, <strong>{{ username }}</strong>! Here’s an overview of the farm:</p>
+
+    <!-- Overview Cards -->
+    <div class="row g-3">
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Total Chickens</h5>
+                    <p class="fs-3">{{ chickens.count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Total Eggs Collected</h5>
+                    <p class="fs-3">{{ eggs.count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-warning text-dark shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Total Sales</h5>
+                    <p class="fs-3">Ksh {{ total_sales|default:"0" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chicken Categories -->
+    <div class="row g-3 mt-3">
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Broilers</h5>
+                    <p class="fs-3">{{ broilers_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-secondary text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Layers</h5>
+                    <p class="fs-3">{{ layers_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-dark text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Kienyeji</h5>
+                    <p class="fs-3">{{ kienyeji_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Data -->
+    <div class="row g-3 mt-3">
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Total Feed Stock</h5>
+                    <p class="fs-3">{{ feeds.count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-danger text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Health Records</h5>
+                    <p class="fs-3">{{ health_records.count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="card bg-secondary text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Total Expenses</h5>
+                    <p class="fs-3">Ksh {{ expenses.total|default:"0" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buttons Section -->
+    <div class="row g-3 mt-4">
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <a href="{% url 'manage_workers' %}" class="btn btn-outline-primary w-100 py-3">Manage Workers</a>
+        </div>
+        {% comment %} <div class="col-lg-4 col-md-6 col-sm-12">
+            <a href="{% url 'manage_sales' %}" class="btn btn-outline-success w-100 py-3">Manage Sales</a>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <a href="{% url 'manage_chickens' %}" class="btn btn-outline-warning w-100 py-3">Manage Chickens</a>
+        </div> {% endcomment %}
+    </div>
+</div>
+{% endblock %}

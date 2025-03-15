@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Add Chickens in Bulk</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Chickens</button>
+    </form>
+    <a href="{% url 'view_chickens' %}">View All Chickens</a>
+{% endblock %}
