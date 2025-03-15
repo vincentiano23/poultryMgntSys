@@ -1,15 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages  
 from django.db import models
+from django.db.models import Sum, F
 from .forms import EggCollectionForm, BulkChickenForm
 from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense
 
-
 # User Authentication Views
-
 def user_login(request):
     """Handles user login"""
     if request.method == 'POST':
@@ -50,28 +49,45 @@ def register(request):
     return render(request, 'poultry/register.html')
 
 # Dashboard Views
-
 @login_required
 def dashboard(request):
     chickens = Chicken.objects.values('category').annotate(total=models.Sum('quantity'))
     
     context = {
         'total_chickens': sum(chicken['total'] for chicken in chickens),
-        'chicken_types': chickens,  # This will hold total counts per category
+        'chicken_types': chickens,  # Holds total counts per category
         'total_eggs': Egg.objects.aggregate(total=models.Sum('quantity'))['total'] or 0,
     }
     return render(request, 'poultry/dashboard.html', context)
 
 
-@login_required
 def admin_dashboard(request):
     """Admin dashboard view"""
     if not request.user.is_staff:
         messages.error(request, "Access Denied: You are not authorized to view this page.")
         return redirect('dashboard')
+
+    # Get total count of chickens grouped by category
+    chickens = Chicken.objects.values('category').annotate(total=Sum('quantity'))
     
+    # Fetch specific counts for Broiler, Layer, and Kienyeji
+    broiler_count = Chicken.objects.filter(category='Broiler').aggregate(total=Sum('quantity'))['total'] or 0
+    layer_count = Chicken.objects.filter(category='Layer').aggregate(total=Sum('quantity'))['total'] or 0
+    kienyeji_count = Chicken.objects.filter(category='Kienyeji').aggregate(total=Sum('quantity'))['total'] or 0
+
+    # Get total eggs and total sales
+    total_eggs = Egg.objects.aggregate(total=Sum('quantity'))['total'] or 0
+    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
+
     context = {
         'username': request.user.username,
+        'total_chickens': sum(chicken['total'] for chicken in chickens),
+        'chicken_types': chickens,
+        'broiler_count': broiler_count,
+        'layer_count': layer_count,
+        'kienyeji_count': kienyeji_count,
+        'total_eggs': total_eggs,
+        'total_sales': total_sales,
         'chickens': Chicken.objects.all(),
         'eggs': Egg.objects.all(),
         'feeds': Feed.objects.all(),
@@ -82,50 +98,44 @@ def admin_dashboard(request):
     return render(request, 'poultry/admin_dashboard.html', context)
 
 # Chicken Management Views
-
 def add_chicken(request):
     if request.method == "POST":
         form = BulkChickenForm(request.POST)
         if form.is_valid():
-            category = form.cleaned_data.get('category')  # Ensure the form has this field
-            quantity = form.cleaned_data.get('quantity', 0) or 0
+            category = form.cleaned_data.get('category')
+            quantity = form.cleaned_data.get('quantity', 0)
 
             if quantity > 0:
                 Chicken.objects.create(category=category, quantity=quantity)
                 messages.success(request, f"{quantity} {category} chickens added successfully!")
-                return redirect('view_chickens')  # Redirect to the view chickens page
-        
+                return redirect('dashboard')
     else:
         form = BulkChickenForm()
 
     return render(request, 'poultry/add_chicken.html', {'form': form})
 
+
 def view_chickens(request):
-    """Displays list of all chickens"""
     return render(request, 'poultry/view_chickens.html', {'chickens': Chicken.objects.all()})
 
 # Egg Management Views
-
 def add_eggs(request):
-    """Handles egg collection"""
     if request.method == "POST":
         form = EggCollectionForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Egg collection recorded successfully!")
             return redirect('view_eggs')
     else:
         form = EggCollectionForm()
     return render(request, 'poultry/add_eggs.html', {'form': form})
 
 def view_eggs(request):
-    """Displays collected eggs sorted by collection date"""
-    return render(request, 'poultry/view_eggs.html', {'eggs': Egg.objects.all().order_by('collected_date')})
+    return render(request, 'poultry/view_eggs.html', {'eggs': Egg.objects.all().order_by('-collected_date')})
 
 # Worker Management Views
-
 @login_required
 def manage_workers(request):
-    """Allows admin to manage workers"""
     if not request.user.is_staff:
         messages.error(request, "Access Denied!")
         return redirect('dashboard')
@@ -142,20 +152,18 @@ def manage_workers(request):
 
 @login_required
 def delete_worker(request, worker_id):
-    """Allows admin to remove a worker"""
     if not request.user.is_staff:
         messages.error(request, "Access Denied!")
         return redirect('dashboard')
     
-    User.objects.get(id=worker_id).delete()
+    worker = get_object_or_404(User, id=worker_id)
+    worker.delete()
     messages.success(request, "Worker removed successfully!")
     return redirect('manage_workers')
 
 # Sales Management Views
-
 @login_required
 def manage_sales(request):
-    """Displays sales records"""
     if not request.user.is_staff:
         messages.error(request, "Access Denied!")
         return redirect('dashboard')

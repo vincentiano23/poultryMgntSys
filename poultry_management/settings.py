@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!@p&k#5-_tc(s8897&@$bjoy#f3)*%_w1!_!co2nbvc%0_+bz)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['poultrymanagement.onrender.com']
+ALLOWED_HOSTS = ['poultrymanagement.onrender.com', '127.0.0.1']
 
 
 # Application definition

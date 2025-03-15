@@ -8,12 +8,15 @@
     <div class="row">
         <div class="col-lg-4 col-md-6 mb-3">
             <div class="card bg-primary text-white shadow">
-                <h3>Total Chickens: {{ total_chickens }}</h3>
+                <div class="card-body">
+                    <h5 class="card-title">Total Chickens</h5>
+                    <h3>{{ total_chickens }}</h3>
                     <ul>
                         {% for chicken in chicken_types %}
                             <li>{{ chicken.category }}: {{ chicken.total }}</li>
                         {% endfor %}
                     </ul>
+                </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-3">
@@ -44,7 +47,12 @@
                     <h5 class="card-title">Add New Chickens</h5>
                     <form method="POST" action="{% url 'add_chicken' %}">
                         {% csrf_token %}
-                        <input type="text" name="chicken_type" class="form-control mb-2" placeholder="Type (Broiler, Layer, etc.)" required>
+                        <select name="chicken_type" class="form-control mb-2" required>
+                            <option value="" disabled selected>Select Type</option>
+                            <option value="Broiler">Broiler</option>
+                            <option value="Layer">Layer</option>
+                            <option value="Kienyeji">Kienyeji</option>
+                        </select>
                         <input type="number" name="quantity" class="form-control mb-2" placeholder="Quantity" required>
                         <button type="submit" class="btn btn-primary w-100">Add Chickens</button>
                     </form>
@@ -66,5 +74,5 @@
             </div>
         </div>
     </div>
-
+</div>
 {% endblock %}
