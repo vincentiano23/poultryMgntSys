@@ -27,10 +27,10 @@ class Egg(models.Model):
 
 # Feed Inventory
 class Feed(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, null=True, blank=True)
     quantity_kg = models.FloatField()
-    date_purchased = models.DateField()
-    
+    date_purchased = models.DateField(null=True, blank=True) 
+   
     def __str__(self):
         return f"{self.name} - {self.quantity_kg}kg"  
 

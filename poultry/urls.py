@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 from .views import dashboard, admin_dashboard, user_login, user_logout, register, manage_workers, delete_worker, manage_sales, add_chicken, add_eggs, view_eggs, view_chickens
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path('add_eggs/', add_eggs, name='add_eggs'),
     path('view_eggs/', view_eggs, name='view_eggs'),
     path('register/', register, name='register'),
+    path('log-feed/', views.log_feed, name='log_feed'),
 ]

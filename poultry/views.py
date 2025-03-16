@@ -52,14 +52,16 @@ def register(request):
 @login_required
 def dashboard(request):
     chickens = Chicken.objects.values('category').annotate(total=models.Sum('quantity'))
-    
+    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
+    total_feeds = Feed.objects.aggregate(total=Sum('quantity_kg'))['total'] or 0
     context = {
         'total_chickens': sum(chicken['total'] for chicken in chickens),
-        'chicken_types': chickens,  # Holds total counts per category
+        'chicken_types': chickens,
         'total_eggs': Egg.objects.aggregate(total=models.Sum('quantity'))['total'] or 0,
+        'total_feeds': total_feeds,
+        'total_sales': total_sales,
     }
     return render(request, 'poultry/dashboard.html', context)
-
 
 def admin_dashboard(request):
     """Admin dashboard view"""
@@ -67,15 +69,10 @@ def admin_dashboard(request):
         messages.error(request, "Access Denied: You are not authorized to view this page.")
         return redirect('dashboard')
 
-    # Get total count of chickens grouped by category
     chickens = Chicken.objects.values('category').annotate(total=Sum('quantity'))
-    
-    # Fetch specific counts for Broiler, Layer, and Kienyeji
     broiler_count = Chicken.objects.filter(category='Broiler').aggregate(total=Sum('quantity'))['total'] or 0
     layer_count = Chicken.objects.filter(category='Layer').aggregate(total=Sum('quantity'))['total'] or 0
     kienyeji_count = Chicken.objects.filter(category='Kienyeji').aggregate(total=Sum('quantity'))['total'] or 0
-
-    # Get total eggs and total sales
     total_eggs = Egg.objects.aggregate(total=Sum('quantity'))['total'] or 0
     total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
 
@@ -104,16 +101,13 @@ def add_chicken(request):
         if form.is_valid():
             category = form.cleaned_data.get('category')
             quantity = form.cleaned_data.get('quantity', 0)
-
             if quantity > 0:
                 Chicken.objects.create(category=category, quantity=quantity)
                 messages.success(request, f"{quantity} {category} chickens added successfully!")
                 return redirect('dashboard')
     else:
         form = BulkChickenForm()
-
     return render(request, 'poultry/add_chicken.html', {'form': form})
-
 
 def view_chickens(request):
     return render(request, 'poultry/view_chickens.html', {'chickens': Chicken.objects.all()})
@@ -129,6 +123,21 @@ def add_eggs(request):
     else:
         form = EggCollectionForm()
     return render(request, 'poultry/add_eggs.html', {'form': form})
+
+def log_feed(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        quantity_kg = request.POST.get('quantity_kg')
+
+        Feed.objects.create(
+            name = name,
+            quantity_kg =quantity_kg,
+        )
+
+        messages.success(request, "Feed record added successfully!")
+        return redirect('log_feed')
+
+    return render(request, 'poultry/log_feed.html')
 
 def view_eggs(request):
     return render(request, 'poultry/view_eggs.html', {'eggs': Egg.objects.all().order_by('-collected_date')})
