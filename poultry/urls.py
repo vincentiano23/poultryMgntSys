@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import dashboard, admin_dashboard, user_login, user_logout, register, manage_workers, delete_worker, manage_sales, add_chicken, add_eggs, view_eggs, view_chickens
+from .views import dashboard, admin_dashboard, user_login, user_logout, register, manage_workers, delete_worker, manage_sales, add_chicken, add_eggs, view_eggs, view_chickens,view_incubation_schedules
 
 urlpatterns = [
     path('', user_login, name='login'), 
@@ -16,4 +16,9 @@ urlpatterns = [
     path('view_eggs/', view_eggs, name='view_eggs'),
     path('register/', register, name='register'),
     path('log-feed/', views.log_feed, name='log_feed'),
+    path('log-dead-chicken/', views.log_dead_chicken, name='log_dead_chicken'),
+    path('record-sale/', views.record_poultry_sale, name='record_poultry_sale'),
+    path('record-incubation/', views.record_incubation, name='record_incubation'),
+    path('view-incubation/', views.view_incubation_schedules, name='view_incubation'),
+    
 ]

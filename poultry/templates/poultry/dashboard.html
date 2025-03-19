@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid mt-4">
     <h2 class="text-center mb-4">🐔 Workers Dashboard</h2>
 
     <!-- Summary Section -->
-    <div class="row">
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card bg-primary text-white shadow">
+    <div class="row g-3">
+        <!-- Total Chickens -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card bg-primary text-white shadow h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Chickens</h5>
                     <h3>{{ total_chickens }}</h3>
-                    <ul class="text-left">
+                    <ul class="list-unstyled text-start">
                         {% for chicken in chicken_types %}
                             <li>{{ chicken.category }}: {{ chicken.total }}</li>
                         {% endfor %}
@@ -20,8 +21,9 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card bg-success text-white shadow">
+        <!-- Total Eggs Collected -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card bg-success text-white shadow h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Eggs Collected</h5>
                     <h3>{{ total_eggs }}</h3>
@@ -29,20 +31,19 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-12 mb-3">
-            <div class="card bg-warning text-white shadow">
+        <!-- Total Sales -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card bg-warning text-white shadow h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Sales</h5>
                     <h3>Ksh {{ total_sales|default:"0" }}</h3>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Additional Summary Section -->
-    <div class="row">
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card bg-info text-white shadow">
+        <!-- Total Feeds Used -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card bg-info text-white shadow h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Feeds Used</h5>
                     <h3>{{ total_feeds|default:"0" }} kg</h3>
@@ -50,8 +51,9 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card bg-danger text-white shadow">
+        <!-- Total Expenses -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card bg-danger text-white shadow h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Expenses</h5>
                     <h3>Ksh {{ total_expenses|default:"0" }}</h3>
@@ -59,8 +61,9 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-12 mb-3">
-            <div class="card bg-secondary text-white shadow">
+        <!-- Health Records -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card bg-secondary text-white shadow h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Health Records</h5>
                     <h3>{{ health_records|default:"0" }} cases</h3>
@@ -69,92 +72,166 @@
         </div>
     </div>
 
-    <!-- Profit Section -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card bg-dark text-white shadow">
+    <!-- Poultry Sales Section -->
+    <div class="row mt-4 g-3">
+        <div class="col-lg-6">
+            <div class="card bg-light shadow h-100">
                 <div class="card-body text-center">
-                    <h5 class="card-title">💰 Net Profit</h5>
-                    <h3>Ksh {{ total_sales|default:"0"|floatformat:2|add:"-total_expenses"|default:"0.00" }}</h3>
+                    <h5 class="card-title">Total Poultry Sold</h5>
+                    <h3>{{ total_poultry_sold|default:"0" }}</h3>
+                    <ul class="list-unstyled text-start">
+                        {% for sale in poultry_sales %}
+                            <li>{{ sale.chicken.category }}: {{ sale.quantity }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card bg-light shadow h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Products Sold</h5>
+                    <h3>{{ total_products_sold|default:"0" }}</h3>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Forms to Add Records -->
-    <h3 class="mt-4">📌 Record New Data</h3>
-    <div class="row">
+    <!-- Profit & Loss Section -->
+    <div class="row mt-4 g-3">
+        <div class="col-lg-6">
+            <div class="card bg-dark text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h5 class ="card-title">Net Profit</h5>
+                    <h3>Ksh {{ total_sales|default:"0"|floatformat:2|add:"-total_expenses"|default:"0.00" }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card bg-danger text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📉 Total Loss</h5>
+                    <h3>
+                        {% if total_sales < total_expenses %}
+                            Ksh {{ total_expenses|default:"0"|floatformat:2|add:"-total_sales"|default:"0.00" }}
+                        {% else %}
+                            No Loss
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forms Section -->
+    <h3 class="mt-4"> Record New Data</h3>
+    <div class="row g-3">
         <!-- Add Chickens -->
         <div class="col-md-6">
-            <div class="card shadow mb-3">
+            <div class="card shadow h-100">
                 <div class="card-body">
                     <h5 class="card-title">Add New Chickens</h5>
                     <form method="POST" action="{% url 'add_chicken' %}">
                         {% csrf_token %}
-                        <select name="chicken_type" class="form-control mb-2" required>
+                        <select name="chicken_type" class="form-select mb-2" required>
                             <option value="" disabled selected>Select Type</option>
                             <option value="Broiler">Broiler</option>
                             <option value="Layer">Layer</option>
                             <option value="Kienyeji">Kienyeji</option>
                         </select>
                         <input type="number" name="quantity" class="form-control mb-2" placeholder="Quantity" required>
+                        <input type="number" name="age_in_weeks" class="form-control mb-2" placeholder="Age in Weeks" required>
+                        <input type="number" name="weight_kg" class="form-control mb-2" placeholder="Weight (kg)" step="0.1" required>
+                        <select name="buy_from" class="form-select mb-2" required>
+                            <option value="" disabled selected>Buy From</option>
+                            <option value="Local Hatch">Local Hatch</option>
+                            <option value="Kukuchic">Kukuchic</option>
+                            <option value="Kenchic">Kenchic</option>
+                            <option value="Others">Others</option>
+                        </select>
+                        <input type="text" name="other_source" class="form-control mb-2" placeholder="Specify Other Source (if any)">
                         <button type="submit" class="btn btn-primary w-100">Add Chickens</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Record Eggs -->
+        <!-- Record Poultry Sales -->
         <div class="col-md-6">
-            <div class="card shadow mb-3">
+            <div class="card shadow h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Record Eggs Collected</h5>
-                    <form method="POST" action="{% url 'add_eggs' %}">
+                    <h5 class="card-title">Record Poultry Sales</h5>
+                    <form method="POST" action="{% url 'record_poultry_sale' %}">
                         {% csrf_token %}
-                        <input type="number" name="quantity" class="form-control mb-2" placeholder="Number of Eggs" required>
-                        <button type="submit" class="btn btn-success w-100">Record Eggs</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Record Feed Usage -->
-        <div class="col-md-6">
-            <div class="card shadow mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Log Feed Usage</h5>
-                    <form method="POST" action="{% url 'log_feed' %}">
-                        {% csrf_token %}
-                        <input type="text" name="name" class="form-control mb-2" placeholder="Feed name" required>
-                        <input type="number" name="quantity_kg" class="form-control mb-2" placeholder="Quantity (kg)" required>
-                        <input type="date" name="date_purchased" class="form-control mb-2" required>
-                        <button type="submit" class="btn btn-info w-100">Log Feed</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Record Health Updates -->
-        {% comment %} <div class="col-md-6">
-            <div class="card shadow mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Update Health Records</h5>
-                    <form method="POST" action="{% url 'update_health' %}">
-                        {% csrf_token %}
-                        <select name="chicken_id" class="form-control mb-2" required>
-                            <option value="" disabled selected>Select Chicken</option>
-                            {% for chicken in chickens %}
-                                <option value="{{ chicken.id }}">{{ chicken.category }} - {{ chicken.quantity }}</option>
+                        <select name="chicken" class="form-select mb-2" required>
+                            <option value="" disabled selected>Select Chicken Type</option>
+                            {% for chicken in chicken_types %}
+                                <option value="{{ chicken.id }}">{{ chicken.category }}</option>
                             {% endfor %}
                         </select>
-                        <input type="text" name="disease" class="form-control mb-2" placeholder="Disease (if any)">
-                        <input type="text" name="medication" class="form-control mb-2" placeholder="Medication (if given)">
-                        <input type="date" name="date_treated" class="form-control mb-2" required>
-                        <button type="submit" class="btn btn-danger w-100">Update Health</button>
+                        <input type="number" name="quantity" class="form-control mb-2" placeholder="Quantity Sold" required>
+                        <input type="number" name="price" class="form-control mb-2" placeholder="Price per Unit" required>
+                        <button type="submit" class="btn btn-warning w-100">Record Sale</button>
                     </form>
                 </div>
             </div>
-        </div> {% endcomment %}
+        </div>
     </div>
+
+    <!-- Record Dead Chickens -->
+    <h3 class="mt-4"><i class="fas fa-skull-crossbones"></i> Record Dead Chickens</h3>
+    <form method="POST" action="{% url 'log_dead_chicken' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                <label for="dead_category">Variety:</label>
+                <select name="dead_category" class="form-control">
+                    <option value="Broiler">Broiler</option>
+                    <option value="Layer">Layer</option>
+                    <option value="Kienyeji">Kienyeji</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for=" age">Age (weeks):</label>
+                <input type="number" name="age" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label for="cause">Cause of Death:</label>
+                <input type="text" name="cause" class="form-control" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-danger mt-3"><i class="fas fa-book-dead"></i> Log Death</button>
+    </form>
 </div>
+
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+<script>
+    function toggleAgeBreakdown(category) {
+        $("#breakdown_" + category).toggle();
+    }
+
+    function updateCountdown() {
+        const incubationDate = new Date("{{ incubation_start_date }}");
+        const hatchDate = new Date(incubationDate.getTime() + (21 * 24 * 60 * 60 * 1000));
+        const now = new Date();
+        const timeLeft = hatchDate - now;
+
+        if (timeLeft > 0) {
+            const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            $("#countdown_timer").text(daysLeft + " days remaining");
+        } else {
+            $("#countdown_timer").text("Hatching Time!");
+        }
+    }
+
+    $(document).ready(function() {
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    });
+</script>
+
 {% endblock %}

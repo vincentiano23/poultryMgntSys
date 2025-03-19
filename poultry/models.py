@@ -9,14 +9,43 @@ class Chicken(models.Model):
         ('Layer', 'Layer'),
         ('Kienyeji', 'Kienyeji'),
     ]
+    BUY_FROM_CHOICES = [
+        ('Local Hatch', 'Local Hatch'),
+        ('Kukuchic', 'Kukuchic'),
+        ('Kenchic', 'Kenchic'),
+        ('Others', 'Others'),
+    ]
 
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     quantity = models.PositiveIntegerField()
+    age_in_weeks = models.PositiveIntegerField()
+    weight_kg = models.FloatField(null=True, blank=True)
+    buy_from = models.CharField(max_length=50, choices=BUY_FROM_CHOICES)
+    other_source = models.CharField(max_length=100, null=True, blank=True)
     date_added = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.category} - {self.quantity}"
+        return f"{self.category} - {self.quantity} - {self.age_in_weeks} weeks"
+    
 
+# Immunization Records
+class ImmunizationRecord(models.Model):
+    chicken = models.ForeignKey(Chicken, on_delete=models.CASCADE)
+    vaccine_name = models.CharField(max_length=100)
+    date_administered = models.DateField()
+
+    def __str__(self):
+        return f"{self.chicken.category} - {self.vaccine_name} on {self.date_administered}"
+
+# Egg Incubation Schedule
+class IncubationSchedule(models.Model):
+    breed = models.CharField(max_length=50)
+    incubation_date = models.DateField()
+    label = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.breed} - Incubated on {self.incubation_date}"  
+    
 # Egg Inventory
 class Egg(models.Model):
     quantity = models.PositiveIntegerField()
@@ -27,12 +56,40 @@ class Egg(models.Model):
 
 # Feed Inventory
 class Feed(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
+    FEED_CHOICES = [
+        ('Starter Mash', 'Starter Mash'),
+        ('Grower Mash', 'Grower Mash'),
+        ('Layer Mash', 'Layer Mash'),
+        ('Finisher Mash', 'Finisher Mash'),
+        ('Other', 'Other'),
+    ]
+    
+    name = models.CharField(max_length=100, choices=FEED_CHOICES, default='Other')
+    custom_name = models.CharField(max_length=100, null=True, blank=True)
     quantity_kg = models.FloatField()
-    date_purchased = models.DateField(null=True, blank=True) 
-   
+    remaining_kg = models.FloatField(default=0)
+    date_purchased = models.DateField(null=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.remaining_kg:
+            self.remaining_kg = self.quantity_kg
+        super().save(*args, **kwargs)
+    
     def __str__(self):
-        return f"{self.name} - {self.quantity_kg}kg"  
+        return f"{self.name if self.name != 'Other' else self.custom_name} - {self.remaining_kg}/{self.quantity_kg}kg"
+
+# Mortality Records
+class MortalityRecord(models.Model):
+    chicken = models.ForeignKey(Chicken, on_delete=models.CASCADE)
+    age_at_death = models.PositiveIntegerField()
+    cause_of_death = models.CharField(max_length=200)
+    comment = models.TextField(null=True, blank=True)
+    recorded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    date_recorded = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.chicken.category} - Died at {self.age_at_death} weeks due to {self.cause_of_death}"
+
 
 # Health Monitoring
 class HealthRecord(models.Model):
@@ -47,22 +104,26 @@ class HealthRecord(models.Model):
 # Sales
 class Sale(models.Model):
     customer_name = models.CharField(max_length=100)
-    item = models.CharField(max_length=50, choices=[('Chicken', 'Chicken'), ('Egg', 'Egg')])
+    chicken = models.ForeignKey(Chicken, on_delete=models.SET_NULL, null=True, blank=True)
+    eggs = models.ForeignKey(Egg, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField()
     price = models.FloatField()
     date_sold = models.DateField(auto_now_add=True)
-    
+
     def __str__(self):
-        return f"{self.customer_name} - {self.quantity} {self.item}(s)"  
+        return f"{self.customer_name} - {self.quantity} sold"
+
 
 # Expenses
 class Expense(models.Model):
     description = models.CharField(max_length=200)
     amount = models.FloatField()
+    related_sale = models.ForeignKey(Sale, on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(auto_now_add=True)
-    
+
     def __str__(self):
-        return f"{self.description} - KES {self.amount}"  
+        return f"{self.description} - KES {self.amount}"
+
 
 # User Roles
 class Profile(models.Model):

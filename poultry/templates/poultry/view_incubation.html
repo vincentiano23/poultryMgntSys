@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h3 class="text-center mb-4">View Incubation Records</h3>
+        <table class="table table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th>Egg Type</th>
+                    <th>Quantity</th>
+                    <th>Date Set</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.egg_type }}</td>
+                    <td>{{ record.quantity }}</td>
+                    <td>{{ record.date_set }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

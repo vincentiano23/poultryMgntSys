@@ -3,7 +3,7 @@ from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, Profile
 
 @admin.register(Chicken)
 class ChickenAdmin(admin.ModelAdmin):
-    list_display = ('category', 'quantity', 'date_added')
+    list_display = ('category', 'quantity', 'age_in_weeks', 'weight_kg', 'date_added')
     list_filter = ('category', 'date_added')
     search_fields = ('category',)
 
@@ -15,7 +15,7 @@ class EggAdmin(admin.ModelAdmin):
 
 @admin.register(Feed)
 class FeedAdmin(admin.ModelAdmin):
-    list_display = ('name', 'quantity_kg', 'date_purchased')
+    list_display = ('name', 'quantity_kg', 'remaining_kg', 'date_purchased')
     list_filter = ('date_purchased',)
     search_fields = ('name',)
 
@@ -27,9 +27,18 @@ class HealthRecordAdmin(admin.ModelAdmin):
 
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
-    list_display = ('customer_name', 'item', 'quantity', 'price', 'date_sold')
-    list_filter = ('date_sold', 'item')
-    search_fields = ('customer_name', 'item')
+    list_display = ('customer_name', 'get_item', 'quantity', 'price', 'date_sold')
+    list_filter = ('date_sold', 'chicken', 'eggs')  # Proper filtering
+    search_fields = ('customer_name', 'chicken__category', 'eggs__collected_date')
+
+    def get_item(self, obj):
+        if obj.chicken:
+            return f"Chicken ({obj.chicken.category})"
+        elif obj.eggs:
+            return "Eggs"
+        return "Unknown"
+
+    get_item.short_description = "Item"  # Display name in admin panel
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
@@ -43,3 +52,17 @@ class ProfileAdmin(admin.ModelAdmin):
     list_filter = ('role',)
     search_fields = ('user__username',)
 
+# Optional: Add a custom admin view for better management
+class CustomAdminSite(admin.AdminSite):
+    site_header = "Poultry Management Admin"
+    site_title = "Poultry Management Admin Portal"
+    index_title = "Welcome to the Poultry Management Admin Portal"
+
+admin_site = CustomAdminSite(name='custom_admin')
+admin_site.register(Chicken, ChickenAdmin)
+admin_site.register(Egg, EggAdmin)
+admin_site.register(Feed, FeedAdmin)
+admin_site.register(HealthRecord, HealthRecordAdmin)
+admin_site.register(Sale, SaleAdmin)
+admin_site.register(Expense, ExpenseAdmin)
+admin_site.register(Profile, ProfileAdmin)

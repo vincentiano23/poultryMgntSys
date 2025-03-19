@@ -1,10 +1,21 @@
+
 {% extends "base.html" %}
+
 {% block content %}
-    <h2>Add Chickens in Bulk</h2>
-    <form method="post">
+<div class="container mt-4">
+    <h2 class="text-center">Add Chickens in Bulk</h2>
+    <form method="post" class="mt-4">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add Chickens</button>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Chicken Details</h5>
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Add Chickens</button>
+            </div>
+        </div>
     </form>
-    <a href="{% url 'view_chickens' %}">View All Chickens</a>
+    <div class="mt-3 text-center">
+        <a href="{% url 'view_chickens' %}" class="btn btn-outline-secondary">View All Chickens</a>
+    </div>
+</div>
 {% endblock %}
