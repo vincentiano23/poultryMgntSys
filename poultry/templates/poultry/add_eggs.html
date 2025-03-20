@@ -1,10 +1,88 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-    <h2>Add Eggs Collection</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add Eggs</button>
-    </form>
-    <a href="{% url 'view_eggs' %}">View Egg Collections</a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <!-- Success & Error Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Add New Eggs</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Egg Variety:</label>
+                            <select name="egg_variety" class="form-select" required>
+                                <option value="">Select Egg Variety</option>
+                                <option value="white">White</option>
+                                <option value="brown">Brown</option>
+                                <option value="organic">Organic</option>
+                                <option value="free_range">Free Range</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Quantity:</label>
+                            <input type="number" name="quantity" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Price per Egg (Ksh):</label>
+                            <input type="number" name="price_per_egg" class="form-control" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Add Eggs</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Recent Eggs List -->
+            <div class="mt-5">
+                <h4 class="text-center">Recent Eggs Added</h4>
+                <table class="table table-bordered table-striped shadow-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Variety</th>
+                            <th>Quantity</th>
+                            <th>Price per Egg (Ksh)</th>
+                            <th>Date Added</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for egg in eggs %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ egg.variety|title }}</td>
+                            <td>{{ egg.quantity }}</td>
+                            <td>{{ egg.price_per_egg }}</td>
+                            <td>{{ egg.date_added }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No eggs recorded yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 {% endblock %}
