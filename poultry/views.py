@@ -119,16 +119,20 @@ def view_chickens(request):
 
 @login_required
 def add_eggs(request):
-    """Record egg collection"""
     if request.method == "POST":
-        form = EggCollectionForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Egg collection recorded successfully!")
-            return redirect('view_eggs')
-    else:
-        form = EggCollectionForm()
-    return render(request, 'poultry/add_eggs.html', {'form': form})
+        variety = request.POST.get("egg_variety")
+        quantity = int(request.POST.get("quantity", 0))
+        price_per_egg = float(request.POST.get("price_per_egg", 0))
+        if quantity <= 0 or price_per_egg <= 0:
+            messages.error(request, "Quantity and price must be greater than zero.")
+            return redirect("add_eggs")
+        egg = Egg(variety=variety, quantity=quantity, price_per_egg=price_per_egg)
+        egg.save()
+        messages.success(request, f"{quantity} eggs added successfully!")
+        return redirect("add_eggs") 
+    return render(request, "poultry/add_eggs.html", {
+        "eggs": Egg.objects.all(),  
+    })
 
 @login_required
 def view_eggs(request):
@@ -186,7 +190,7 @@ def record_poultry_sale(request):
         customer_name = request.POST.get("customer_name")
         quantity = int(request.POST.get("quantity", 0))
         price = float(request.POST.get("price", 0))
-        poultry_type = request.POST.get("sale_type")  
+        poultry_type = request.POST.get("sale_type")  # Ensure this matches your form field
 
         # Validate input
         if quantity <= 0 or price <= 0:
@@ -196,7 +200,7 @@ def record_poultry_sale(request):
         if poultry_type == "chicken":
             chicken_id = request.POST.get("chicken_id")
             chicken = Chicken.objects.get(id=chicken_id) if chicken_id else None
-            chicken_variety = request.POST.get("chicken_variety") 
+            chicken_variety = request.POST.get("chicken_variety")  # Get the chicken variety
             if not chicken:
                 messages.error(request, "Invalid chicken selection!")
                 return redirect("record_poultry_sale")
@@ -209,12 +213,12 @@ def record_poultry_sale(request):
                 customer_name=customer_name,
                 chicken=chicken,
                 quantity=quantity,
-                price=price * quantity,  
-                chicken_variety=chicken_variety  
+                price=price * quantity,  # Calculate total price
+                chicken_variety=chicken_variety  # Assign the chicken variety
             )
         elif poultry_type == "egg":
             egg_id = request.POST.get("egg_id")
-            egg_variety = request.POST.get("egg_variety")  
+            egg_variety = request.POST.get("egg_variety")  # Get the egg variety
             egg = Egg.objects.get(id=egg_id) if egg_id else None
             if not egg:
                 messages.error(request, "Invalid egg selection!")
@@ -228,7 +232,7 @@ def record_poultry_sale(request):
                 customer_name=customer_name,
                 eggs=egg,
                 quantity=quantity,
-                price=price * quantity,  
+                price=price * quantity, 
                 egg_variety=egg_variety  
             )
         else:

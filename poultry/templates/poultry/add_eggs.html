@@ -50,35 +50,35 @@
                 </div>
             </div>
 
-            <!-- Recent Eggs List -->
+           <!-- Recent Eggs List -->
             <div class="mt-5">
-                <h4 class="text-center">Recent Eggs Added</h4>
-                <table class="table table-bordered table-striped shadow-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Variety</th>
-                            <th>Quantity</th>
-                            <th>Price per Egg (Ksh)</th>
-                            <th>Date Added</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for egg in eggs %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ egg.variety|title }}</td>
-                            <td>{{ egg.quantity }}</td>
-                            <td>{{ egg.price_per_egg }}</td>
-                            <td>{{ egg.date_added }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">No eggs recorded yet.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <h4 class="text-center">Recent Eggs Added</h4>
+            <table class="table table-bordered table-striped shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Variety</th>
+                        <th>Quantity</th>
+                        <th>Price per Egg (Ksh)</th>
+                        <th>Date Added</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for egg in eggs %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ egg.variety|title }}</td>
+                        <td>{{ egg.quantity }}</td>
+                        <td>{{ egg.price_per_egg }}</td>  <!-- Ensure this matches your model -->
+                        <td>{{ egg.collected_date }}</td>  <!-- Ensure this matches your model -->
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No eggs recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             </div>
 
         </div>

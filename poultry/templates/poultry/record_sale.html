@@ -60,11 +60,20 @@
                         <!-- Egg Selection -->
                         <div class="mb-3" id="eggSection" style="display: none;">
                             <label class="form-label">Choose Egg:</label>
-                            <select name="egg_id" class="form-select">
+                            <select name="egg_id" class="form-select" required>
                                 <option value="">Select Egg</option>
                                 {% for egg in eggs %}
                                 <option value="{{ egg.id }}">{{ egg }}</option>
                                 {% endfor %}
+                            </select>
+                        
+                            <label class="form-label mt-2">Egg Variety:</label>
+                            <select name="egg_variety" class="form-select" required>
+                                <option value="">Select Egg Variety</option>
+                                <option value="white">White</option>
+                                <option value="brown">Brown</option>
+                                <option value="organic">Organic</option>
+                                <option value="free_range">Free Range</option>
                             </select>
                         </div>
 

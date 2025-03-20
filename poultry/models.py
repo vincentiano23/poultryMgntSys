@@ -55,13 +55,14 @@ class Egg(models.Model):
         ('free_range', 'Free Range'),
     ]
 
+    variety = models.CharField(max_length=20, choices=VARIETY_CHOICES,null=True, blank=True)
     quantity = models.PositiveIntegerField()
-    variety = models.CharField(max_length=50, null=True, blank=True)
+    price_per_egg = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) 
     collected_date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.quantity} {self.variety} eggs on {self.collected_date}"
-
+    
 # Feed Inventory
 class Feed(models.Model):
     FEED_CHOICES = [
