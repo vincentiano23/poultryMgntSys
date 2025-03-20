@@ -186,32 +186,53 @@ def record_poultry_sale(request):
         customer_name = request.POST.get("customer_name")
         quantity = int(request.POST.get("quantity", 0))
         price = float(request.POST.get("price", 0))
-        poultry_type = request.POST.get("poultry_type") 
+        poultry_type = request.POST.get("sale_type")  # Updated to match the form field name
+
+        # Validate input
+        if quantity <= 0 or price <= 0:
+            messages.error(request, "Quantity and price must be greater than zero.")
+            return redirect("record_poultry_sale")
 
         if poultry_type == "chicken":
-            chicken_id = request.POST.get("chicken_id") 
+            chicken_id = request.POST.get("chicken_id")
             chicken = Chicken.objects.get(id=chicken_id) if chicken_id else None
+            if not chicken:
+                messages.error(request, "Invalid chicken selection!")
+                return redirect("record_poultry_sale")
+            if chicken.quantity < quantity:
+                messages.error(request, "Insufficient quantity of chickens to sell!")
+                return redirect("record_poultry_sale")
+            chicken.quantity -= quantity
+            chicken.save()
             sale = Sale.objects.create(
                 customer_name=customer_name,
                 chicken=chicken,
                 quantity=quantity,
-                price=price
+                price=price * quantity  # Calculate total price
             )
         elif poultry_type == "egg":
-            egg_id = request.POST.get("egg_id")  
+            egg_id = request.POST.get("egg_id")
             egg = Egg.objects.get(id=egg_id) if egg_id else None
+            if not egg:
+                messages.error(request, "Invalid egg selection!")
+                return redirect("record_poultry_sale")
+            if egg.quantity < quantity:
+                messages.error(request, "Insufficient quantity of eggs to sell!")
+                return redirect("record_poultry_sale")
+            egg.quantity -= quantity
+            egg.save()
             sale = Sale.objects.create(
                 customer_name=customer_name,
                 eggs=egg,
                 quantity=quantity,
-                price=price
+                price=price * quantity  # Calculate total price
             )
         else:
             messages.error(request, "Invalid poultry type selected!")
             return redirect("record_poultry_sale")
 
-        messages.success(request, f"Sale recorded successfully! Total price: Ksh {sale.price}")
-        return redirect("record_poultry_sale")  
+        messages.success(request, f"Sale recorded successfully! Total price: Ksh {sale.price:.2f}")
+        return redirect("record_poultry_sale")
 
     return render(request, "poultry/record_sale.html", {
         "sales": Sale.objects.all(),
