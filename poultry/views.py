@@ -196,6 +196,7 @@ def record_poultry_sale(request):
         if poultry_type == "chicken":
             chicken_id = request.POST.get("chicken_id")
             chicken = Chicken.objects.get(id=chicken_id) if chicken_id else None
+            chicken_variety = request.POST.get("chicken_variety")  # Get the chicken variety
             if not chicken:
                 messages.error(request, "Invalid chicken selection!")
                 return redirect("record_poultry_sale")
@@ -208,7 +209,8 @@ def record_poultry_sale(request):
                 customer_name=customer_name,
                 chicken=chicken,
                 quantity=quantity,
-                price=price * quantity  # Calculate total price
+                price=price * quantity,  # Calculate total price
+                chicken_variety=chicken_variety  # Assign the chicken variety
             )
         elif poultry_type == "egg":
             egg_id = request.POST.get("egg_id")

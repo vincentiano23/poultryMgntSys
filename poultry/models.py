@@ -104,11 +104,12 @@ class HealthRecord(models.Model):
 # Sales
 class Sale(models.Model):
     customer_name = models.CharField(max_length=100)
-    chicken = models.ForeignKey(Chicken, on_delete=models.SET_NULL, null=True, blank=True)
-    eggs = models.ForeignKey(Egg, on_delete=models.SET_NULL, null=True, blank=True)
+    chicken = models.ForeignKey(Chicken, null=True, blank=True, on_delete=models.CASCADE)
+    eggs = models.ForeignKey(Egg, null=True, blank=True, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    price = models.FloatField()
-    date_sold = models.DateField(auto_now_add=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    date_sold = models.DateTimeField(auto_now_add=True)
+    chicken_variety = models.CharField(max_length=50, null=True, blank=True)  
 
     def __str__(self):
         return f"{self.customer_name} - {self.quantity} sold"
