@@ -59,6 +59,7 @@ class Egg(models.Model):
     quantity = models.PositiveIntegerField()
     price_per_egg = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) 
     collected_date = models.DateField(auto_now_add=True)
+ 
 
     def __str__(self):
         return f"{self.quantity} {self.variety} eggs on {self.collected_date}"
@@ -120,7 +121,8 @@ class Sale(models.Model):
     date_sold = models.DateTimeField(auto_now_add=True)
     chicken_variety = models.CharField(max_length=50, null=True, blank=True)  
     egg_variety = models.CharField(max_length=20, null=True, blank=True)
-
+    related_sale = models.ForeignKey('Sale', null=True, blank=True, on_delete=models.CASCADE) 
+   
     def __str__(self):
         return f"{self.customer_name} - {self.quantity} sold"
 
