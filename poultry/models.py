@@ -48,11 +48,19 @@ class IncubationSchedule(models.Model):
     
 # Egg Inventory
 class Egg(models.Model):
+    VARIETY_CHOICES = [
+        ('white', 'White'),
+        ('brown', 'Brown'),
+        ('organic', 'Organic'),
+        ('free_range', 'Free Range'),
+    ]
+
     quantity = models.PositiveIntegerField()
+    variety = models.CharField(max_length=50, null=True, blank=True)
     collected_date = models.DateField(auto_now_add=True)
-    
+
     def __str__(self):
-        return f"{self.quantity} eggs on {self.collected_date}"  
+        return f"{self.quantity} {self.variety} eggs on {self.collected_date}"
 
 # Feed Inventory
 class Feed(models.Model):
@@ -110,6 +118,7 @@ class Sale(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     date_sold = models.DateTimeField(auto_now_add=True)
     chicken_variety = models.CharField(max_length=50, null=True, blank=True)  
+    egg_variety = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return f"{self.customer_name} - {self.quantity} sold"
