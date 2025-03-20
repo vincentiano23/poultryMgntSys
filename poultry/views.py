@@ -182,7 +182,42 @@ def manage_sales(request):
 @login_required
 def record_poultry_sale(request):
     """Record a new poultry sale"""
-    return render(request, 'poultry/record_sale.html', {"sales": Sale.objects.all()})
+    if request.method == "POST":
+        customer_name = request.POST.get("customer_name")
+        quantity = int(request.POST.get("quantity", 0))
+        price = float(request.POST.get("price", 0))
+        poultry_type = request.POST.get("poultry_type") 
+
+        if poultry_type == "chicken":
+            chicken_id = request.POST.get("chicken_id") 
+            chicken = Chicken.objects.get(id=chicken_id) if chicken_id else None
+            sale = Sale.objects.create(
+                customer_name=customer_name,
+                chicken=chicken,
+                quantity=quantity,
+                price=price
+            )
+        elif poultry_type == "egg":
+            egg_id = request.POST.get("egg_id")  
+            egg = Egg.objects.get(id=egg_id) if egg_id else None
+            sale = Sale.objects.create(
+                customer_name=customer_name,
+                eggs=egg,
+                quantity=quantity,
+                price=price
+            )
+        else:
+            messages.error(request, "Invalid poultry type selected!")
+            return redirect("record_poultry_sale")
+
+        messages.success(request, f"Sale recorded successfully! Total price: Ksh {sale.price}")
+        return redirect("record_poultry_sale")  
+
+    return render(request, "poultry/record_sale.html", {
+        "sales": Sale.objects.all(),
+        "chickens": Chicken.objects.all(),
+        "eggs": Egg.objects.all(),
+    })
 
 @login_required
 def record_incubation(request):

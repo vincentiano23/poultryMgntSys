@@ -1,40 +1,160 @@
-{% extends 'poultry/base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Record Poultry Sale</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <!-- Success & Error Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-    {% if messages %}
-        <div class="alert alert-success">
-            {% for message in messages %}
-                {{ message }}
-            {% endfor %}
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Record Poultry Sale</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Customer Name:</label>
+                            <input type="text" name="customer_name" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Sale Type:</label>
+                            <select name="sale_type" id="saleType" class="form-select" required>
+                                <option value="">Select Sale Type</option>
+                                <option value="chicken">Chicken</option>
+                                <option value="egg">Egg</option>
+                            </select>
+                        </div>
+
+                        <!-- Chicken Selection -->
+                        <div class="mb-3" id="chickenSection" style="display: none;">
+                            <label class="form-label">Chicken Variety:</label>
+                            <select name="chicken_variety" class="form-select">
+                                <option value="">Select Variety</option>
+                                <option value="broiler">Broiler</option>
+                                <option value="layer">Layer</option>
+                                <option value="kienyeji">Kienyeji</option>
+                            </select>
+
+                            <label class="form-label mt-2">Choose Chicken:</label>
+                            <select name="chicken_id" class="form-select">
+                                <option value="">Select Chicken</option>
+                                {% for chicken in chickens %}
+                                <option value="{{ chicken.id }}">{{ chicken }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Egg Selection -->
+                        <div class="mb-3" id="eggSection" style="display: none;">
+                            <label class="form-label">Choose Egg:</label>
+                            <select name="egg_id" class="form-select">
+                                <option value="">Select Egg</option>
+                                {% for egg in eggs %}
+                                <option value="{{ egg.id }}">{{ egg }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Quantity:</label>
+                            <input type="number" name="quantity" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Price (Ksh):</label>
+                            <input type="number" name="price" class="form-control" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Record Sale</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sales List -->
+            <div class="mt-5">
+                <h4 class="text-center">Recent Sales</h4>
+                <table class="table table-bordered table-striped shadow-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Sale Type</th>
+                            <th>Variety</th>
+                            <th>Quantity</th>
+                            <th>Price (Ksh)</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ sale.customer_name }}</td>
+                            <td>
+                                {% if sale.chicken %}
+                                    Chicken
+                                {% elif sale.egg %}
+                                    Egg
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if sale.chicken_variety %}
+                                    {{ sale.chicken_variety|title }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ sale.quantity }}</td>
+                            <td>{{ sale.price }}</td>
+                            <td>{{ sale.date_sold }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No sales recorded yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
         </div>
-    {% endif %}
-
-    <form method="POST">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="chicken_type" class="form-label">Chicken Type</label>
-            <select name="chicken_type" id="chicken_type" class="form-control" required>
-                <option value="Broiler">Broiler</option>
-                <option value="Layer">Layer</option>
-                <option value="Kienyeji">Kienyeji</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="quantity" class="form-label">Quantity</label>
-            <input type="number" name="quantity" id="quantity" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="price" class="form-label">Price per Chicken (Ksh)</label>
-            <input type="number" name="price" id="price" class="form-control" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Record Sale</button>
-        <a href="{% url 'manage_sales' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const saleType = document.getElementById("saleType");
+        const chickenSection = document.getElementById("chickenSection");
+        const eggSection = document.getElementById("eggSection");
+
+        saleType.addEventListener("change", function () {
+            if (this.value === "chicken") {
+                chickenSection.style.display = "block";
+                eggSection.style.display = "none";
+            } else if (this.value === "egg") {
+                chickenSection.style.display = "none";
+                eggSection.style.display = "block";
+            } else {
+                chickenSection.style.display = "none";
+                eggSection.style.display = "none";
+            }
+        });
+    });
+</script>
+
 {% endblock %}
