@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages  
 from django.db.models import Sum, F
-from .forms import EggCollectionForm, BulkChickenForm, IncubationScheduleForm, DeadChickenForm
+from decimal import Decimal
+from .forms import EggCollectionForm, BulkChickenForm, IncubationScheduleForm, DeadChickenForm, ExpenseForm
 from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, IncubationSchedule, MortalityRecord
 
 def user_login(request):
@@ -52,7 +53,10 @@ def register(request):
 def dashboard(request):
     """Worker dashboard"""
     chickens = Chicken.objects.values('category').annotate(total=Sum('quantity'))
-    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
+    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or Decimal('0.0')
+    total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or Decimal('0.0')
+    total_expenses = Decimal(str(total_expenses)) 
+    net_profit = total_sales - total_expenses
     total_feeds = Feed.objects.aggregate(total=Sum('quantity_kg'))['total'] or 0
     context = {
         'total_chickens': sum(chicken['total'] for chicken in chickens),
@@ -60,6 +64,9 @@ def dashboard(request):
         'total_eggs': Egg.objects.aggregate(total=Sum('quantity'))['total'] or 0,
         'total_feeds': total_feeds,
         'total_sales': total_sales,
+        'total_expenses': total_expenses,
+        'net_profit': net_profit,
+
     }
     return render(request, 'poultry/dashboard.html', context)
 
@@ -283,3 +290,24 @@ def log_dead_chicken(request):
 def view_dead_chickens(request):
     """View all dead chickens"""
     return render(request, 'poultry/view_dead_chickens.html', {'dead_chickens': MortalityRecord.objects.all()})
+
+@login_required
+def expenses_list(request):
+    expenses = Expense.objects.all()  
+    total_expenses = sum(exp.amount for exp in expenses) 
+
+    if request.method == "POST":
+        form = ExpenseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Expense added successfully!")
+            return redirect("expenses_list")  
+    else:
+        form = ExpenseForm()
+
+    context = {
+        "expenses": expenses,
+        "total_expenses": total_expenses,
+        "form": form
+    }
+    return render(request, "poultry/expenses.html", context)

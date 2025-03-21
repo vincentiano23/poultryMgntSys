@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import dashboard, admin_dashboard, user_login, user_logout, register, manage_workers, delete_worker, manage_sales, add_chicken, add_eggs, view_eggs, view_chickens,view_incubation_schedules
+from .views import dashboard, admin_dashboard, user_login, user_logout, register, manage_workers, delete_worker, manage_sales, add_chicken, add_eggs, view_eggs, view_chickens,view_incubation_schedules, expenses_list
 
 urlpatterns = [
     path('', user_login, name='login'), 
@@ -20,5 +20,5 @@ urlpatterns = [
     path('record-sale/', views.record_poultry_sale, name='record_poultry_sale'),
     path('record-incubation/', views.record_incubation, name='record_incubation'),
     path('view-incubation/', views.view_incubation_schedules, name='view_incubation'),
-    
+    path("expenses/", expenses_list, name="expenses_list"),
 ]

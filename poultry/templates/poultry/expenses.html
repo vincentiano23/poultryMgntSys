@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Manage Expenses</h2>
+
+    <div class="row g-4">
+  
+        <div class="col-md-4">
+            <div class="card shadow bg-danger text-white text-center">
+                <div class="card-body">
+                    <h5 class="fw-bold">Total Expenses</h5>
+                    <h3 class="fw-bold">KES {{ total_expenses|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="fw-bold">Add New Expense</h5>
+                    <form method="POST" class="mt-3">
+                        {% csrf_token %}
+                        <div class="mb-3">{{ form.as_p }}</div>
+                        <button type="submit" class="btn btn-primary w-100">Add Expense</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense List -->
+    <div class="mt-5">
+        <h4 class="fw-bold">Expense List</h4>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Amount (KES)</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.description }}</td>
+                        <td>{{ expense.amount|floatformat:2 }}</td>
+                        <td>{{ expense.date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">No expenses recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

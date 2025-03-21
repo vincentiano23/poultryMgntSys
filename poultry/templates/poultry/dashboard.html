@@ -109,17 +109,11 @@
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-12">
-            <div class="card bg-danger text-white shadow h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">📉 Total Loss</h5>
-                    <h3>
-                        {% if total_sales < total_expenses %}
-                            Ksh {{ total_expenses|default:"0"|floatformat:2|add:"-total_sales"|default:"0.00" }}
-                        {% else %}
-                            No Loss
-                        {% endif %}
-                    </h3>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Net Profit</h5>
+                    <h3>Ksh {{ net_profit|floatformat:2 }}</h3>
                 </div>
             </div>
         </div>
@@ -128,7 +122,6 @@
     <!-- Navigation Buttons Section -->
     <h3 class="mt-4"> Record New Data</h3>
     <div class="row g-3">
-        <!-- Add Chickens Button -->
         <div class="col-md-4 col-sm-12">
             <div class="card shadow h-100">
                 <div class="card-body text-center">
@@ -137,7 +130,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4 col-sm-12">
             <div class="card shadow h-100">
                 <div class="card-body text-center">
@@ -147,7 +140,6 @@
             </div>
         </div>
 
-        <!-- Record Poultry Sales Button -->
         <div class="col-md-4 col-sm-12">
             <div class="card shadow h-100">
                 <div class="card-body text-center">
@@ -157,7 +149,15 @@
             </div>
         </div>
 
-        <!-- Record Dead Chickens Button -->
+        <div class="col-md-4 col-sm-12">
+            <div class="card shadow h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Record Total Expenses</h5>
+                    <a href="{% url 'expenses_list' %}" class="btn btn-warning w-100">Record Expenses</a>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-4 col-sm-12">
             <div class="card shadow h-100">
                 <div class="card-body text-center">
