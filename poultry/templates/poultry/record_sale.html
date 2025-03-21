@@ -18,7 +18,7 @@
 
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white text-center">
-                    <h4>Record Total Sales</h4>
+                    <h4>Record Poultry Sale</h4>
                 </div>
                 <div class="card-body">
                     <form method="POST">
@@ -52,39 +52,39 @@
                             <select name="chicken_id" class="form-select">
                                 <option value="">Select Chicken</option>
                                 {% for chicken in chickens %}
-                                <option value="{{ chicken.id }}">{{ chicken }}</option>
+                                <option value="{{ chicken.id }}">{{ chicken.variety }} - Available: {{ chicken.quantity }}</option>
                                 {% endfor %}
                             </select>
                         </div>
 
                         <!-- Egg Selection -->
                         <div class="mb-3" id="eggSection" style="display: none;">
-                            <label class="form-label">Choose Egg:</label>
-                            <select name="egg_id" class="form-select" required>
-                                <option value="">Select Egg</option>
-                                {% for egg in eggs %}
-                                <option value="{{ egg.id }}">{{ egg }}</option>
-                                {% endfor %}
-                            </select>
-                        
-                            <label class="form-label mt-2">Egg Variety:</label>
-                            <select name="egg_variety" class="form-select" required>
-                                <option value="">Select Egg Variety</option>
+                            <label class="form-label">Egg Variety:</label>
+                            <select name="egg_variety" class="form-select">
+                                <option value="">Select Variety</option>
                                 <option value="white">White</option>
                                 <option value="brown">Brown</option>
                                 <option value="organic">Organic</option>
                                 <option value="free_range">Free Range</option>
                             </select>
+
+                            <label class="form-label mt-2">Choose Egg:</label>
+                            <select name="egg_id" class="form-select">
+                                <option value="">Select Egg</option>
+                                {% for egg in eggs %}
+                                <option value="{{ egg.id }}">{{ egg.variety }} - Available: {{ egg.quantity }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Quantity:</label>
-                            <input type="number" name="quantity" class="form-control" required>
+                            <input type="number" name="quantity" class="form-control" min="1" required>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Price (Ksh):</label>
-                            <input type="number" name="price_per_egg" class="form-control" required>
+                            <label class="form-label">Price per Unit (Ksh):</label>
+                            <input type="number" name="price" class="form-control" min="1" required>
                         </div>
 
                         <button type="submit" class="btn btn-success w-100">Record Sale</button>
@@ -113,19 +113,15 @@
                             <td>{{ forloop.counter }}</td>
                             <td>{{ sale.customer_name }}</td>
                             <td>
-                                {% if sale.chicken %}
-                                    Chicken
-                                {% elif sale.egg %}
-                                    Egg
-                                {% else %}
-                                    N/A
+                                {% if sale.chicken %} Chicken 
+                                {% elif sale.eggs %} Egg 
+                                {% else %} N/A 
                                 {% endif %}
                             </td>
                             <td>
-                                {% if sale.chicken_variety %}
-                                    {{ sale.chicken_variety|title }}
-                                {% else %}
-                                    N/A
+                                {% if sale.chicken_variety %} {{ sale.chicken_variety|title }}
+                                {% elif sale.egg_variety %} {{ sale.egg_variety|title }}
+                                {% else %} N/A 
                                 {% endif %}
                             </td>
                             <td>{{ sale.quantity }}</td>

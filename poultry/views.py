@@ -190,9 +190,9 @@ def record_poultry_sale(request):
         customer_name = request.POST.get("customer_name")
         quantity = int(request.POST.get("quantity", 0))
         price = float(request.POST.get("price", 0))
-        poultry_type = request.POST.get("sale_type")  # Ensure this matches your form field
+        poultry_type = request.POST.get("sale_type") 
 
-        # Validate input
+      
         if quantity <= 0 or price <= 0:
             messages.error(request, "Quantity and price must be greater than zero.")
             return redirect("record_poultry_sale")
@@ -213,12 +213,12 @@ def record_poultry_sale(request):
                 customer_name=customer_name,
                 chicken=chicken,
                 quantity=quantity,
-                price=price * quantity,  # Calculate total price
-                chicken_variety=chicken_variety  # Assign the chicken variety
+                price=price * quantity,
+                chicken_variety=chicken_variety  
             )
         elif poultry_type == "egg":
             egg_id = request.POST.get("egg_id")
-            egg_variety = request.POST.get("egg_variety")  # Get the egg variety
+            egg_variety = request.POST.get("egg_variety")  
             egg = Egg.objects.get(id=egg_id) if egg_id else None
             if not egg:
                 messages.error(request, "Invalid egg selection!")
