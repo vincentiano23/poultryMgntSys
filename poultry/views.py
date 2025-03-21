@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages  
 from django.db.models import Sum, F
 from decimal import Decimal
+from django.utils import timezone
 from .forms import EggCollectionForm, BulkChickenForm, IncubationScheduleForm, DeadChickenForm, ExpenseForm
 from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, IncubationSchedule, MortalityRecord
 
@@ -195,13 +196,63 @@ def delete_worker(request, worker_id):
     messages.success(request, "Worker removed successfully!")
     return redirect('manage_workers')
 
+
 @login_required
 def manage_sales(request):
     """View and manage sales"""
     if not request.user.is_staff:
         messages.error(request, "Access Denied!")
         return redirect('dashboard')
-    return render(request, 'poultry/manage_sales.html', {"sales": Sale.objects.all()})
+    if request.method == "POST":
+        customer_name = request.POST.get('customer_name')
+        sale_type = request.POST.get('sale_type')
+        quantity = int(request.POST.get('quantity'))
+        price = float(request.POST.get('price'))
+        chicken = None
+        egg = None
+
+        if sale_type == "chicken":
+            chicken_id = request.POST.get('chicken_id')
+            chicken = Chicken.objects.get(id=chicken_id)
+            if chicken.quantity < quantity:
+                messages.error(request, "Not enough chickens available.")
+                return redirect('manage_sales')
+            chicken.quantity -= quantity  
+            chicken.save() 
+
+        elif sale_type == "egg":
+            egg_id = request.POST.get('egg_id')
+            egg = Egg.objects.get(id=egg_id)
+            if egg.quantity < quantity:
+                messages.error(request, "Not enough eggs available.")
+                return redirect('manage_sales')
+            egg.quantity -= quantity  
+            egg.save()  
+
+        sale = Sale(
+            customer_name=customer_name,
+            sale_type=sale_type,
+            quantity=quantity,
+            price=price,
+            date_sold=timezone.now(),
+            chicken=chicken,
+            egg=egg,
+        )
+        sale.save()  
+
+        messages.success(request, "Sale recorded successfully!")
+        return redirect('manage_sales')
+
+    sales = Sale.objects.all()
+    chickens = Chicken.objects.all()  
+    eggs = Egg.objects.all()  
+
+    context = {
+        'sales': sales,
+        'chickens': chickens,
+        'eggs': eggs,
+    }
+    return render(request, 'poultry/manage_sales.html', context)
 
 @login_required
 def record_poultry_sale(request):
