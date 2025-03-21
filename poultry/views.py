@@ -169,7 +169,20 @@ def manage_workers(request):
     if not request.user.is_staff:
         messages.error(request, "Access Denied!")
         return redirect('dashboard')
-    return render(request, "poultry/manage_workers.html", {"workers": User.objects.filter(is_staff=False)})
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists!")
+        else:
+            worker = User.objects.create_user(username=username, password=password)
+            messages.success(request, "Worker added successfully!")
+
+    workers = User.objects.filter(is_staff=False)
+    return render(request, "poultry/manage_workers.html", {"workers": workers})
+
 
 @login_required
 def delete_worker(request, worker_id):
