@@ -41,16 +41,27 @@
             </div>
         </div>
 
-        <!-- Total Feeds Used -->
         <div class="col-lg-4 col-md-6 col-sm-12">
             <div class="card bg-info text-white shadow h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Feeds Used</h5>
                     <h3>{{ total_feeds|default:"0" }} kg</h3>
+        
+                    {% if feed_types %}
+                        <hr>
+                        <h6 class="text-white">Feed Breakdown:</h6>
+                        <ul class="list-unstyled">
+                            {% for feed in feed_types %}
+                                <li>{{ feed.name }} - {{ feed.total }} kg</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No feed recorded yet.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
-
+        
         <!-- Total Expenses -->
         <div class="col-lg-4 col-md-6 col-sm-12">
             <div class="card bg-danger text-white shadow h-100">
@@ -148,6 +159,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="card shadow h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Record Feeds Used</h5>
+                    <a href="{% url 'log_feed' %}" class="btn btn-warning w-100">Record feeds</a>
+                </div>
+            </div>
+        </div>
+
 
         <div class="col-md-4 col-sm-12">
             <div class="card shadow h-100">

@@ -58,12 +58,14 @@ def dashboard(request):
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or Decimal('0.0')
     total_expenses = Decimal(str(total_expenses)) 
     net_profit = total_sales - total_expenses
-    total_feeds = Feed.objects.aggregate(total=Sum('quantity_kg'))['total'] or 0
+    total_feeds = Feed.objects.aggregate(total_used=Sum('quantity_kg'))['total_used'] or 0
+    feed_types = Feed.objects.values('name').annotate(total=Sum('quantity_kg'))
     context = {
         'total_chickens': sum(chicken['total'] for chicken in chickens),
         'chicken_types': chickens,
         'total_eggs': Egg.objects.aggregate(total=Sum('quantity'))['total'] or 0,
         'total_feeds': total_feeds,
+        'feed_types': feed_types,
         'total_sales': total_sales,
         'total_expenses': total_expenses,
         'net_profit': net_profit,
@@ -152,16 +154,32 @@ def log_feed(request):
     """Log feed records"""
     if request.method == "POST":
         name = request.POST.get('name')
+        custom_name = request.POST.get('custom_name', '').strip()
         quantity_kg = request.POST.get('quantity_kg')
+        date_purchased = request.POST.get('date_purchased')
+        # Validate inputs
+        if not name or not quantity_kg or not date_purchased:
+            messages.error(request, "All fields are required.")
+            return redirect('log_feed')
+        try:
+            quantity_kg = float(quantity_kg)
+            if quantity_kg <= 0:
+                messages.error(request, "Quantity must be a positive number.")
+                return redirect('log_feed')
+        except ValueError:
+            messages.error(request, "Invalid quantity entered.")
+            return redirect('log_feed')
 
-        Feed.objects.create(
+        # Save feed entry
+        feed = Feed.objects.create(
             name=name,
+            custom_name=custom_name if name == "Other" else "",
             quantity_kg=quantity_kg,
+            remaining_kg=quantity_kg,
+            date_purchased=date_purchased
         )
-
-        messages.success(request, "Feed record added successfully!")
+        messages.success(request, f"Feed '{feed.name}' recorded successfully!")
         return redirect('log_feed')
-
     return render(request, 'poultry/log_feed.html')
 
 @login_required

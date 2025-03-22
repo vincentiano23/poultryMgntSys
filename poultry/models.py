@@ -75,7 +75,7 @@ class Feed(models.Model):
     ]
     
     name = models.CharField(max_length=100, choices=FEED_CHOICES, default='Other')
-    custom_name = models.CharField(max_length=100, null=True, blank=True)
+    custom_name = models.CharField(max_length=255, default="")
     quantity_kg = models.FloatField()
     remaining_kg = models.FloatField(default=0)
     date_purchased = models.DateField(null=True, blank=True)

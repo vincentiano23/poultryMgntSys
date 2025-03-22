@@ -2,36 +2,66 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center">Log New Feed</h2>
+    <h2 class="text-center mb-4 text-primary">Log New Feed</h2>
 
     <!-- Display messages -->
     {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} text-center">{{ message }}</div>
+            {% endfor %}
+        </div>
     {% endif %}
 
     <div class="card shadow-sm p-4">
-        <form method="POST" action="{% url 'log_feed' %}">
+        <form method="POST" action="{% url 'log_feed' %}" class="row g-3">
             {% csrf_token %}
 
-            <div class="mb-3">
-                <label for="name" class="form-label">Feed name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+
+            <div class="col-md-6">
+                <label for="name" class="form-label fw-bold">Feed Type</label>
+                <select class="form-select" id="name" name="name" required>
+                    <option value="" selected disabled>Select feed type</option>
+                    <option value="Starter Mash">Starter Mash</option>
+                    <option value="Grower Mash">Grower Mash</option>
+                    <option value="Layer Mash">Layer Mash</option>
+                    <option value="Finisher Mash">Finisher Mash</option>
+                    <option value="Other">Other (Specify Below)</option>
+                </select>
             </div>
 
-            <div class="mb-3">
-                <label for="quantity" class="form-label">Quantity (kg)</label>
-                <input type="number" class="form-control" id="quantity_kg" name="quantity_kg" required>
+            <div class="col-md-6" id="custom_name_container" style="display: none;">
+                <label for="custom_name" class="form-label fw-bold">Custom Feed Name</label>
+                <input type="text" class="form-control" id="custom_name" name="custom_name" placeholder="Enter feed name">
             </div>
 
-            <div class="mb-3">
-                <label for="date_purchased" class="form-label">Date Purchased</label>
+            <div class="col-md-6">
+                <label for="quantity_kg" class="form-label fw-bold">Quantity (kg)</label>
+                <input type="number" class="form-control" id="quantity_kg" name="quantity_kg" min="1" placeholder="Enter quantity" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="date_purchased" class="form-label fw-bold">Date Purchased</label>
                 <input type="date" class="form-control" id="date_purchased" name="date_purchased" required>
             </div>
 
-            <button type="submit" class="btn btn-success w-100">Save Feed Log</button>
+            <div class="col-12 d-flex justify-content-center">
+                <button type="submit" class="btn btn-success fw-bold px-5">Save Feed Log</button>
+            </div>
         </form>
     </div>
 </div>
+
+<!-- JavaScript to Show Custom Feed Name Input -->
+<script>
+    document.getElementById("name").addEventListener("change", function () {
+        let customNameContainer = document.getElementById("custom_name_container");
+        if (this.value === "Other") {
+            customNameContainer.style.display = "block";
+        } else {
+            customNameContainer.style.display = "none";
+        }
+    });
+</script>
+
 {% endblock %}
