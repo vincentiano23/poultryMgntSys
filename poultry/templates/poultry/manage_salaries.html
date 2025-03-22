@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="text-center mb-4">Manage Workers' Salaries</h3>
+
+    <div class="row">
+        <!-- Add Salary Form -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-body">
+                    <h5 class="text-center text-primary mb-3">Add Salary</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Worker</label>
+                            {{ form.worker }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Amount (Ksh)</label>
+                            {{ form.amount }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            {{ form.status }}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add Salary</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salary List -->
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body">
+                    <h5 class="text-center text-primary mb-3">Salary Records</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Worker</th>
+                                    <th>Amount (Ksh)</th>
+                                    <th>Payment Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for salary in salaries %}
+                                    <tr>
+                                        <td><strong>{{ salary.worker.username }}</strong></td>
+                                        <td>{{ salary.amount }}</td>
+                                        <td>{{ salary.payment_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <span class="badge {% if salary.status == 'Paid' %} bg-success {% else %} bg-warning {% endif %}">
+                                                {{ salary.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No salary records available</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

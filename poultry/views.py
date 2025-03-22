@@ -6,8 +6,8 @@ from django.contrib import messages
 from django.db.models import Sum, F
 from decimal import Decimal
 from django.utils import timezone
-from .forms import EggCollectionForm, BulkChickenForm, IncubationScheduleForm, DeadChickenForm, ExpenseForm
-from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, IncubationSchedule, MortalityRecord
+from .forms import EggCollectionForm, BulkChickenForm, IncubationScheduleForm, DeadChickenForm, ExpenseForm, SalaryForm
+from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, IncubationSchedule, MortalityRecord, Salary
 
 def user_login(request):
     """Handles user login"""
@@ -295,6 +295,24 @@ def manage_sales(request):
         'eggs': eggs,
     }
     return render(request, 'poultry/manage_sales.html', context)
+
+@login_required
+def manage_salaries(request):
+    """Admin function to manage workers' salaries."""
+    salaries = Salary.objects.select_related('worker').order_by('-payment_date')
+    if request.method == "POST":
+        form = SalaryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("manage_salaries")
+    else:
+        form = SalaryForm()
+
+    context = {
+        "salaries": salaries,
+        "form": form
+    }
+    return render(request, "poultry/manage_salaries.html", context)
 
 @login_required
 def record_poultry_sale(request):

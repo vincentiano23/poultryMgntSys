@@ -1,5 +1,5 @@
 from django import forms
-from .models import Chicken, Egg, Sale, Feed, Expense, HealthRecord, MortalityRecord, IncubationSchedule
+from .models import Chicken, Egg, Sale, Feed, Expense, HealthRecord, MortalityRecord, IncubationSchedule, Salary
 
 class BulkChickenForm(forms.Form):
     CATEGORY_CHOICES = [
@@ -93,3 +93,8 @@ class IncubationScheduleForm(forms.ModelForm):
             'incubation_date': 'Incubation Date',
             'label': 'Label (for identification)'
         }
+
+class SalaryForm(forms.ModelForm):
+    class Meta:
+        model = Salary
+        fields = ['worker', 'amount', 'status']
