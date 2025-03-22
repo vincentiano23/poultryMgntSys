@@ -22,14 +22,27 @@
         </div>
 
         <!-- Total Eggs Collected -->
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-success text-white shadow h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Total Eggs Collected</h5>
-                    <h3>{{ total_eggs }}</h3>
-                </div>
+    <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card bg-success text-white shadow h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Eggs Collected</h5>
+                <h3>{{ total_eggs|default:"0" }}</h3>
+
+                {% if egg_counts %}
+                    <hr>
+                    <h6 class="text-white">Egg Breakdown by Variety:</h6>
+                    <ul class="list-unstyled">
+                        {% for egg in egg_counts %}
+                            <li>{{ egg.variety|title }} - {{ egg.total }} eggs</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No eggs collected yet.</p>
+                {% endif %}
             </div>
         </div>
+    </div>
+
 
         <!-- Total Sales -->
         <div class="col-lg-4 col-md-6 col-sm-12">

@@ -54,6 +54,7 @@ def register(request):
 def dashboard(request):
     """Worker dashboard"""
     chickens = Chicken.objects.values('category').annotate(total=Sum('quantity'))
+    egg_counts = Egg.objects.values('variety').annotate(total=Sum('quantity'))
     total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or Decimal('0.0')
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or Decimal('0.0')
     total_expenses = Decimal(str(total_expenses)) 
@@ -61,8 +62,10 @@ def dashboard(request):
     total_feeds = Feed.objects.aggregate(total_used=Sum('quantity_kg'))['total_used'] or 0
     feed_types = Feed.objects.values('name').annotate(total=Sum('quantity_kg'))
     context = {
+        'username': request.user.username,
         'total_chickens': sum(chicken['total'] for chicken in chickens),
         'chicken_types': chickens,
+        'egg_counts': egg_counts,
         'total_eggs': Egg.objects.aggregate(total=Sum('quantity'))['total'] or 0,
         'total_feeds': total_feeds,
         'feed_types': feed_types,
@@ -81,6 +84,7 @@ def admin_dashboard(request):
         messages.error(request, "Access Denied: You are not authorized to view this page.")
         return redirect('dashboard')
     chickens = Chicken.objects.values('category').annotate(total=Sum('quantity'))
+    egg_counts = Egg.objects.values('variety').annotate(total=Sum('quantity'))
     total_chickens = sum(chicken['total'] for chicken in chickens)
     broiler_count = next((ch['total'] for ch in chickens if ch['category'] == 'Broiler'), 0)
     layers_count = next((ch['total'] for ch in chickens if ch['category'] == 'Layer'), 0)
@@ -93,8 +97,10 @@ def admin_dashboard(request):
     net_profit = total_sales - total_expenses
 
     context = {
+        'username': request.user.username,
         'total_chickens': total_chickens,
         'chicken_types': chickens,
+        'egg_counts': egg_counts,
         'broiler_count': broiler_count,
         'layers_count': layers_count,
         'kienyeji_count': kienyeji_count,

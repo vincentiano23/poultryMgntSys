@@ -3,8 +3,9 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-center">Admin Dashboard</h2>
-    <p class="text-center">Welcome, <strong>{{ username }}</strong>! Here’s an updated farm overview:</p>
-
+    <p class="text-center">
+        Welcome, <strong class="text-primary">{{ request.user.username }}</strong>! Here’s an updated farm overview:
+    </p>
     <!-- Overview Cards -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
         <div class="col">
@@ -88,6 +89,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Recorded Egg Varieties -->
+    <div class="row g-3 mt-4">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h5 class="text-center">Egg Varieties Collected</h5>
+                    <ul class="list-group">
+                        {% for egg in egg_counts %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ egg.variety|title }}
+                                <span class="badge bg-success rounded-pill">{{ egg.total }} eggs</span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted text-center">No egg data recorded</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Recorded Feed Types -->
     <div class="row g-3 mt-4">
