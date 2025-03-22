@@ -75,18 +75,35 @@ def dashboard(request):
 
 @login_required
 def admin_dashboard(request):
-    """Admin dashboard"""
+    """Admin dashboard with enhanced data aggregation"""
+    
     if not request.user.is_staff:
         messages.error(request, "Access Denied: You are not authorized to view this page.")
         return redirect('dashboard')
-
     chickens = Chicken.objects.values('category').annotate(total=Sum('quantity'))
-    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
+    total_chickens = sum(chicken['total'] for chicken in chickens)
+    broiler_count = next((ch['total'] for ch in chickens if ch['category'] == 'Broiler'), 0)
+    layers_count = next((ch['total'] for ch in chickens if ch['category'] == 'Layer'), 0)
+    kienyeji_count = next((ch['total'] for ch in chickens if ch['category'] == 'Kienyeji'), 0)
+    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or Decimal('0.0')
+    total_feeds = Feed.objects.aggregate(total_used=Sum('quantity_kg'))['total_used'] or Decimal('0.0')
+    feed_types = Feed.objects.values('name').annotate(total=Sum('quantity_kg'))
+    total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or Decimal('0.0')
+    total_expenses = Decimal(str(total_expenses)) 
+    net_profit = total_sales - total_expenses
+
     context = {
-        'total_chickens': sum(chicken['total'] for chicken in chickens),
+        'total_chickens': total_chickens,
         'chicken_types': chickens,
+        'broiler_count': broiler_count,
+        'layers_count': layers_count,
+        'kienyeji_count': kienyeji_count,
         'total_eggs': Egg.objects.aggregate(total=Sum('quantity'))['total'] or 0,
         'total_sales': total_sales,
+        'total_feeds': total_feeds,
+        'feed_types': feed_types,
+        'total_expenses': total_expenses,
+        'net_profit': net_profit,
         'chickens': Chicken.objects.all(),
         'eggs': Egg.objects.all(),
         'feeds': Feed.objects.all(),
@@ -94,6 +111,7 @@ def admin_dashboard(request):
         'expenses': Expense.objects.all(),
         'health_records': HealthRecord.objects.all(),
     }
+
     return render(request, 'poultry/admin_dashboard.html', context)
 
 @login_required

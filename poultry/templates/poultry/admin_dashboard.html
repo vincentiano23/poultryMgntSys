@@ -3,28 +3,28 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-center">Admin Dashboard</h2>
-    <p class="text-center">Welcome, <strong>{{ username }}</strong>! Here’s an overview of the farm:</p>
+    <p class="text-center">Welcome, <strong>{{ username }}</strong>! Here’s an updated farm overview:</p>
 
     <!-- Overview Cards -->
-    <div class="row g-3">
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-primary text-white shadow-sm">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+        <div class="col">
+            <div class="card bg-primary text-white shadow-lg">
                 <div class="card-body text-center">
                     <h5>Total Chickens</h5>
                     <p class="fs-3">{{ total_chickens }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-success text-white shadow-sm">
+        <div class="col">
+            <div class="card bg-success text-white shadow-lg">
                 <div class="card-body text-center">
                     <h5>Total Eggs Collected</h5>
                     <p class="fs-3">{{ total_eggs }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-warning text-dark shadow-sm">
+        <div class="col">
+            <div class="card bg-warning text-dark shadow-lg">
                 <div class="card-body text-center">
                     <h5>Total Sales</h5>
                     <p class="fs-3">Ksh {{ total_sales|default:"0" }}</p>
@@ -34,25 +34,25 @@
     </div>
 
     <!-- Chicken Categories -->
-    <div class="row g-3 mt-3">
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-info text-white shadow-sm">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-3">
+        <div class="col">
+            <div class="card bg-info text-white shadow-lg">
                 <div class="card-body text-center">
                     <h5>Broilers</h5>
                     <p class="fs-3">{{ broiler_count }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-secondary text-white shadow-sm">
+        <div class="col">
+            <div class="card bg-secondary text-white shadow-lg">
                 <div class="card-body text-center">
                     <h5>Layers</h5>
-                    <p class="fs-3">{{ layer_count }}</p>
+                    <p class="fs-3">{{ layers_count }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-dark text-white shadow-sm">
+        <div class="col">
+            <div class="card bg-dark text-white shadow-lg">
                 <div class="card-body text-center">
                     <h5>Kienyeji</h5>
                     <p class="fs-3">{{ kienyeji_count }}</p>
@@ -61,26 +61,26 @@
         </div>
     </div>
 
-    <!-- Additional Data -->
-    <div class="row g-3 mt-3">
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-info text-white shadow-sm">
+    <!-- Feed Stock & Expenses -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-3">
+        <div class="col">
+            <div class="card bg-info text-white shadow-lg">
                 <div class="card-body text-center">
                     <h5>Total Feed Stock</h5>
                     <p class="fs-3">{{ total_feeds }} kgs</p>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-danger text-white shadow-sm">
+        <div class="col">
+            <div class="card bg-danger text-white shadow-lg">
                 <div class="card-body text-center">
                     <h5>Health Records</h5>
                     <p class="fs-3">{{ health_records.count }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <div class="card bg-secondary text-white shadow-sm">
+        <div class="col">
+            <div class="card bg-secondary text-white shadow-lg">
                 <div class="card-body text-center">
                     <h5>Total Expenses</h5>
                     <p class="fs-3">Ksh {{ total_expenses|default:"0" }}</p>
@@ -89,17 +89,31 @@
         </div>
     </div>
 
-    <!-- Buttons Section -->
+    <!-- Recorded Feed Types -->
     <div class="row g-3 mt-4">
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <a href="{% url 'manage_workers' %}" class="btn btn-outline-primary w-100 py-3">Manage Workers</a>
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h5 class="text-center">Feed Types Recorded</h5>
+                    <ul class="list-group">
+                        {% for feed in feed_types %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ feed.name }}
+                                <span class="badge bg-primary rounded-pill">{{ feed.total }} kgs</span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted text-center">No feed data recorded</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <a href="{% url 'manage_sales' %}" class="btn btn-outline-success w-100 py-3"> Manage Sales</a>
-        </div>
-        {% comment %} <div class="col-lg-4 col-md-6 col-sm-12">
-            <a href="{% url 'manage_chickens' %}" class="btn btn-outline-warning w-100 py-3">Manage Chickens</a>
-        </div> {% endcomment %}
+    </div>
+
+    <!-- Buttons Section -->
+    <div class="d-grid gap-3 mt-4">
+        <a href="{% url 'manage_workers' %}" class="btn btn-outline-primary py-3">Manage Workers</a>
+        <a href="{% url 'manage_sales' %}" class="btn btn-outline-success py-3">Manage Sales</a>
     </div>
 </div>
 {% endblock %}
