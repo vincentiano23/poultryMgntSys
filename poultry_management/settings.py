@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', 
+    'poultry.middlewares.PreventSessionHijackingMiddleware',
 ]
 
 ROOT_URLCONF = 'poultry_management.urls'
@@ -123,3 +124,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_AGE = 600  
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  
+SESSION_COOKIE_SECURE = True  
+SESSION_COOKIE_HTTPONLY = True 
+SESSION_COOKIE_SAMESITE = 'Lax'  
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SECURE_BROWSER_XSS_FILTER = True  

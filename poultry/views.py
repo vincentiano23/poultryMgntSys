@@ -59,12 +59,17 @@ def dashboard(request):
     """Worker dashboard"""
     chickens = Chicken.objects.values('category').annotate(total=Sum('quantity'))
     egg_counts = Egg.objects.values('variety').annotate(total=Sum('quantity'))
-    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or Decimal('0.0')
-    total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or Decimal('0.0')
-    total_expenses = Decimal(str(total_expenses)) 
+
+    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total']
+    total_sales = total_sales if total_sales else Decimal('0.0')
+
+    total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"]
+    total_expenses = Decimal(str(total_expenses)) if total_expenses else Decimal('0.0')
+
     net_profit = total_sales - total_expenses
     total_feeds = Feed.objects.aggregate(total_used=Sum('quantity_kg'))['total_used'] or 0
     feed_types = Feed.objects.values('name').annotate(total=Sum('quantity_kg'))
+
     context = {
         'username': request.user.username,
         'total_chickens': sum(chicken['total'] for chicken in chickens),
@@ -76,7 +81,6 @@ def dashboard(request):
         'total_sales': total_sales,
         'total_expenses': total_expenses,
         'net_profit': net_profit,
-
     }
     return render(request, 'poultry/dashboard.html', context)
 
@@ -87,22 +91,29 @@ def admin_dashboard(request):
     if not request.user.is_staff:
         messages.error(request, "Access Denied: You are not authorized to view this page.")
         return redirect('dashboard')
+
     chickens = Chicken.objects.values('category').annotate(total=Sum('quantity'))
     egg_counts = Egg.objects.values('variety').annotate(total=Sum('quantity'))
-    total_chickens = sum(chicken['total'] for chicken in chickens)
-    broiler_count = next((ch['total'] for ch in chickens if ch['category'] == 'Broiler'), 0)
-    layers_count = next((ch['total'] for ch in chickens if ch['category'] == 'Layer'), 0)
-    kienyeji_count = next((ch['total'] for ch in chickens if ch['category'] == 'Kienyeji'), 0)
-    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total'] or Decimal('0.0')
-    total_feeds = Feed.objects.aggregate(total_used=Sum('quantity_kg'))['total_used'] or Decimal('0.0')
-    feed_types = Feed.objects.values('name').annotate(total=Sum('quantity_kg'))
-    total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or Decimal('0.0')
-    total_expenses = Decimal(str(total_expenses)) 
+
+    total_sales = Sale.objects.aggregate(total=Sum(F('price') * F('quantity')))['total']
+    total_sales = total_sales if total_sales else Decimal('0.0')
+
+    total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"]
+    total_expenses = Decimal(str(total_expenses)) if total_expenses else Decimal('0.0')
+
     net_profit = total_sales - total_expenses
+    total_feeds = Feed.objects.aggregate(total_used=Sum('quantity_kg'))['total_used'] or 0
+    feed_types = Feed.objects.values('name').annotate(total=Sum('quantity_kg'))
+
+    # Chicken counts categorized
+    chicken_counts = {ch['category']: ch['total'] for ch in chickens}
+    broiler_count = chicken_counts.get('Broiler', 0)
+    layers_count = chicken_counts.get('Layer', 0)
+    kienyeji_count = chicken_counts.get('Kienyeji', 0)
 
     context = {
         'username': request.user.username,
-        'total_chickens': total_chickens,
+        'total_chickens': sum(chicken['total'] for chicken in chickens),
         'chicken_types': chickens,
         'egg_counts': egg_counts,
         'broiler_count': broiler_count,

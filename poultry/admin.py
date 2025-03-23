@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.decorators import user_passes_test
 from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, Profile
 
 @admin.register(Chicken)
@@ -72,3 +73,10 @@ admin_site.register(HealthRecord, HealthRecordAdmin)
 admin_site.register(Sale, SaleAdmin)
 admin_site.register(Expense, ExpenseAdmin)
 admin_site.register(Profile, ProfileAdmin)
+
+def superuser_required(view_func):
+    """Restrict admin actions to superusers only."""
+    return user_passes_test(lambda u: u.is_superuser)(view_func)
+
+# Restrict admin login to superusers only
+admin.site.login = superuser_required(admin.site.login)
