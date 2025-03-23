@@ -7,7 +7,7 @@ from django.db.models import Sum, F
 from decimal import Decimal
 from django.utils import timezone
 from .forms import EggCollectionForm, BulkChickenForm, IncubationScheduleForm, DeadChickenForm, ExpenseForm, SalaryForm
-from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, IncubationSchedule, MortalityRecord, Salary
+from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, IncubationSchedule, MortalityRecord, Salary, Profile
 
 def user_login(request):
     """Handles user login"""
@@ -30,24 +30,28 @@ def user_logout(request):
     return redirect('login')
 
 def register(request):
-    """Handles user registration"""
+    """Handles user registration securely"""
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        role = request.POST.get('role', 'worker')
-
+        role = request.POST.get('role', 'Worker').title() 
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already taken. Please choose a different one.")
             return redirect('register')
         if len(password) < 6:
             messages.error(request, "Password must be at least 6 characters long.")
             return redirect('register')
-
-        user = User.objects.create_user(username=username, password=password, is_staff=(role == 'admin'))
+        if role == 'Admin' and (not request.user.is_authenticated or not request.user.is_superuser):
+            messages.error(request, "Only superusers can create admin accounts.")
+            return redirect('register')
+        user = User.objects.create_user(username=username, password=password)
+        if role == 'Admin':
+            user.is_staff = True  
+            user.save()
+        Profile.objects.create(user=user, role=role)
         login(request, user)
         messages.success(request, "Account successfully created! Welcome to the system.")
         return redirect('admin_dashboard' if user.is_staff else 'dashboard')
-    
     return render(request, 'poultry/register.html')
 
 @login_required

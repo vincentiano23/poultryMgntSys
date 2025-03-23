@@ -52,6 +52,12 @@ class ProfileAdmin(admin.ModelAdmin):
     list_filter = ('role',)
     search_fields = ('user__username',)
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if not request.user.is_superuser:
+            form.base_fields['role'].disabled = True
+        return form
+
 # Optional: Add a custom admin view for better management
 class CustomAdminSite(admin.AdminSite):
     site_header = "Poultry Management Admin"

@@ -1,6 +1,20 @@
 from django import forms
-from .models import Chicken, Egg, Sale, Feed, Expense, HealthRecord, MortalityRecord, IncubationSchedule, Salary
+from .models import Chicken, Egg, Sale, Feed, Expense, HealthRecord, MortalityRecord, IncubationSchedule, Salary, Profile
 
+
+class RegistrationForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['user', 'role']  
+
+    def clean_role(self):
+        role = self.cleaned_data.get('role')
+        user = self.instance.user  
+        if role == "admin" and not user.is_superuser:
+            raise forms.ValidationError("Only superusers can create admins.")
+        
+        return role
+    
 class BulkChickenForm(forms.Form):
     CATEGORY_CHOICES = [
         ('Broiler', 'Broiler'),
