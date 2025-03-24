@@ -9,6 +9,15 @@ from django.utils import timezone
 from .forms import EggCollectionForm, BulkChickenForm, IncubationScheduleForm, DeadChickenForm, ExpenseForm, SalaryForm
 from .models import Chicken, Egg, Feed, HealthRecord, Sale, Expense, IncubationSchedule, MortalityRecord, Salary, Profile
 
+def home(request):
+    return render(request, 'poultry/home.html')
+
+def about(request):
+    return render(request, 'poultry/about.html')
+
+def contact(request):
+    return render(request, 'poultry/contact.html')
+
 def user_login(request):
     """Handles user login"""
     if request.method == 'POST':

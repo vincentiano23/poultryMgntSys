@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center text-white d-flex align-items-center justify-content-center position-relative" style="background: url('{% static 'images/hero.jpg' %}') center/cover no-repeat; height: 60vh;">
+    <div class="overlay position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0, 0, 0, 0.5);"></div>
+    <div class="container position-relative">
+        <h1 class="display-4 fw-bold">Poultry Management System</h1>
+        <p class="lead">Efficiently manage your poultry farm with ease.</p>
+        <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" 
+        class="btn btn-warning btn-lg mt-3 shadow">
+        Get Started
+        </a>
+    </div>
+</div>
+
+<!-- Image Carousel -->
+<div id="carouselExample" class="carousel slide mt-5" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="{% static 'images/farm.jpg' %}" class="d-block w-100 rounded" alt="Farm">
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'images/chicken.jpg' %}" class="d-block w-100 rounded" alt="Chickens">
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'images/eggs.jpg' %}" class="d-block w-100 rounded" alt="Eggs">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+
+<!-- Features Section -->
+<div class="container text-center mt-5">
+    <h2 class="mb-4">Our Features</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <img src="{% static 'images/monitor_inv.jpg' %}" class="card-img-top rounded-top" alt="Inventory">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Track Inventory</h5>
+                    <p class="card-text">Manage your poultry stock, feed, and products effortlessly.</p>
+                    <a href="#" class="btn btn-primary shadow-sm">Learn More</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <img src="{% static 'images/monitor-sales.jpg' %}" class="card-img-top rounded-top" alt="Sales">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Monitor Sales</h5>
+                    <p class="card-text">Keep track of sales and generate insightful reports.</p>
+                    <a href="#" class="btn btn-primary shadow-sm">Learn More</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <img src="{% static 'images/monitor-health.jpg' %}" class="card-img-top rounded-top" alt="Health">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Health Management</h5>
+                    <p class="card-text">Ensure your poultry is in good health with timely updates.</p>
+                    <a href="#" class="btn btn-primary shadow-sm">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
